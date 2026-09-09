@@ -51,8 +51,13 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Jumlah (Rp)</label>
-                        <input type="number" name="amount" class="form-control" value="<?= $transaction->amount ?>" required min="0">
+                        <label>Jumlah <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text font-weight-bold">Rp</span>
+                            </div>
+                            <input type="text" inputmode="numeric" name="amount" class="form-control rupiah-input font-weight-bold" value="<?= (int)$transaction->amount ?>" required autocomplete="off">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Tanggal</label>

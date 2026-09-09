@@ -457,12 +457,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Intl.NumberFormat('id-ID').format(number);
     }
 
-    document.querySelectorAll('.rupiah-input').forEach(function(input) {
-        input.addEventListener('keyup', function(e) {
-            let val = this.value.replace(/[^0-9]/g, '');
-            this.value = val ? formatRupiah(val) : '';
-        });
-    });
 
     document.querySelectorAll('.btn-edit-wallet').forEach(function(btn) {
         btn.addEventListener('click', function() {

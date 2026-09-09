@@ -206,9 +206,9 @@ $overall_pct = ($total_target_platform > 0) ? min(($total_deposit_platform / $to
                             <div class="input-group-prepend">
                                 <span class="input-group-text font-weight-bold">Rp</span>
                             </div>
-                            <input type="number" name="target_amount" class="form-control form-control-lg font-weight-bold text-primary" 
+                            <input type="text" inputmode="numeric" name="target_amount" class="form-control form-control-lg font-weight-bold text-primary rupiah-input" 
                                    value="<?= (int) ($user->target->target_amount ?? 500000) ?>" 
-                                   placeholder="Contoh: 1000000" required min="0" step="10000">
+                                   placeholder="0" required autocomplete="off">
                         </div>
                         <small class="form-text text-muted mt-1">
                             Setoran tabungan bulan ini saat ini: <strong>Rp <?= number_format($user->total_deposit ?? 0, 0, ',', '.') ?></strong>.

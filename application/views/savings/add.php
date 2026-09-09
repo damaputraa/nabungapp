@@ -15,9 +15,14 @@
 
                 <form action="<?= site_url('savings/add') ?>" method="POST">
                     <div class="form-group">
-                        <label>Jumlah Setoran (Rp) <span class="text-danger">*</span></label>
-                        <input type="number" name="amount" class="form-control" 
-                               placeholder="Masukkan jumlah setoran" required min="1000" step="1000">
+                        <label>Jumlah Setoran <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text font-weight-bold">Rp</span>
+                            </div>
+                            <input type="text" inputmode="numeric" name="amount" class="form-control rupiah-input font-weight-bold" 
+                                   placeholder="0" required autocomplete="off">
+                        </div>
                         <small class="text-muted">Minimal Rp 1.000</small>
                     </div>
                     <div class="form-group">
