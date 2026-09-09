@@ -69,9 +69,9 @@
 								</div>
 								<div class="col-md-2">
 									<div class="form-group">
-										<label>&nbsp;</label>
-										<button type="submit" class="btn btn-primary btn-block">
-											<i class="fas fa-search"></i> Filter
+										<label class="d-none d-md-block">&nbsp;</label>
+										<button type="submit" class="btn btn-primary btn-block" style="height: 44px; border-radius: 10px; font-weight: 600;">
+											<i class="fas fa-search mr-1"></i> Filter
 										</button>
 									</div>
 								</div>

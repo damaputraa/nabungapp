@@ -659,4 +659,107 @@ body.user-mode .content-header {
 
 @media (max-width: 768px) {
     body.user-mode .small-box .inner h3 {
-        font-siz
+        font-size: 18px !important;
+    }
+    
+    body.user-mode .small-box .icon {
+        font-size: 32px !important;
+        right: 10px !important;
+    }
+    
+    body.user-mode .card-body {
+        padding: 14px 16px !important;
+    }
+    
+    body.user-mode .card-header {
+        padding: 14px 16px !important;
+    }
+    
+    body.user-mode .table thead th,
+    body.user-mode .table tbody td {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+    
+    body.user-mode .btn {
+        padding: 8px 18px !important;
+        font-size: 13px !important;
+    }
+    
+    body.user-mode .modal-dialog {
+        margin: 10px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body.user-mode .small-box .inner h3 {
+        font-size: 16px !important;
+    }
+    
+    body.user-mode .small-box .icon {
+        font-size: 28px !important;
+        right: 8px !important;
+    }
+    
+    body.user-mode .col-6 {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+}
+
+/* ================================================================ */
+/* ANIMASI MASUK - GOJEK STYLE                                     */
+/* ================================================================ */
+
+body.user-mode .fade-in {
+    animation: gojekFadeIn 0.5s ease-out !important;
+}
+
+@keyframes gojekFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body.user-mode .slide-up {
+    animation: gojekSlideUp 0.6s ease-out !important;
+}
+
+@keyframes gojekSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================================================ */
+/* SCROLLBAR - GOJEK STYLE                                         */
+/* ================================================================ */
+
+body.user-mode ::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+}
+
+body.user-mode ::-webkit-scrollbar-track {
+    background: #f0f0f0 !important;
+    border-radius: 10px !important;
+}
+
+body.user-mode ::-webkit-scrollbar-thumb {
+    background: var(--gojek-green-gradient) !important;
+    border-radius: 10px !important;
+}
+
+body.user-mode ::-webkit-scrollbar-thumb:hover {
+    background: var(--gojek-green-dark) !important;
+}

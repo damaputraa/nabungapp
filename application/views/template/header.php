@@ -64,11 +64,11 @@ $is_admin = ($role === 'admin');
     <!-- ============================================================ -->
     <!-- CUSTOM CSS -->
     <!-- ============================================================ -->
-    <link rel="stylesheet" href="<?= base_url('assets/css/custom.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/custom.css?v=' . filemtime(FCPATH . 'assets/css/custom.css')) ?>">
     
     <!-- User Mode CSS (khusus role user biasa) -->
     <?php if (!$is_admin): ?>
-    <link rel="stylesheet" href="<?= base_url('assets/css/user-mode.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/css/user-mode.css?v=' . filemtime(FCPATH . 'assets/css/user-mode.css')) ?>">
     <?php endif; ?>
     
     <!-- ============================================================ -->

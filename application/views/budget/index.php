@@ -1,4 +1,4 @@
-<div class="container-fluid px-3 py-4" style="max-width: 1140px; margin: 0 auto;">
+<div class="container-fluid px-3 py-4">
     
     <!-- HEADER & ACTION -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
@@ -58,43 +58,56 @@
     <?php endif; ?>
 
     <!-- FILTER PERIODE & STATS SUMMARY -->
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-5 mb-3 mb-md-0">
-            <form action="<?= site_url('budget') ?>" method="GET" class="d-flex align-items-center gap-2">
-                <select name="month" class="form-control" style="border-radius: 10px;" onchange="this.form.submit()">
-                    <?php 
-                    $months = [
-                        '01'=>'Januari', '02'=>'Februari', '03'=>'Maret', '04'=>'April',
-                        '05'=>'Mei', '06'=>'Juni', '07'=>'Juli', '08'=>'Agustus',
-                        '09'=>'September', '10'=>'Oktober', '11'=>'November', '12'=>'Desember'
-                    ];
-                    foreach ($months as $k => $v): 
-                    ?>
-                    <option value="<?= $k ?>" <?= $selected_month == $k ? 'selected' : '' ?>><?= $v ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <select name="year" class="form-control" style="border-radius: 10px; width: 110px;" onchange="this.form.submit()">
-                    <?php for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++): ?>
-                    <option value="<?= $y ?>" <?= $selected_year == $y ? 'selected' : '' ?>><?= $y ?></option>
-                    <?php endfor; ?>
-                </select>
-            </form>
-        </div>
-
-        <div class="col-md-7">
-            <div class="row">
-                <div class="col-6">
-                    <div class="p-3 bg-white shadow-sm border" style="border-radius: 14px;">
-                        <span class="text-muted small">Total Anggaran</span>
-                        <h5 class="font-weight-bold text-dark mb-0">Rp <?= number_format($total_budget, 0, ',', '.') ?></h5>
-                    </div>
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 18px; background: #ffffff;">
+        <div class="card-body p-3 p-md-4">
+            <div class="row align-items-center">
+                <div class="col-lg-5 col-md-12 mb-3 mb-lg-0">
+                    <form action="<?= site_url('budget') ?>" method="GET" id="budgetFilterForm">
+                        <label class="font-weight-bold small text-muted text-uppercase mb-2 d-flex align-items-center" style="letter-spacing: 0.5px;">
+                            <i class="fas fa-calendar-alt text-primary mr-2"></i> Periode Anggaran
+                        </label>
+                        <div class="d-flex align-items-center" style="gap: 10px;">
+                            <div class="flex-grow-1">
+                                <select name="month" class="form-control" onchange="document.getElementById('budgetFilterForm').submit()">
+                                    <?php 
+                                    $months = [
+                                        '01'=>'Januari', '02'=>'Februari', '03'=>'Maret', '04'=>'April',
+                                        '05'=>'Mei', '06'=>'Juni', '07'=>'Juli', '08'=>'Agustus',
+                                        '09'=>'September', '10'=>'Oktober', '11'=>'November', '12'=>'Desember'
+                                    ];
+                                    foreach ($months as $k => $v): 
+                                    ?>
+                                    <option value="<?= $k ?>" <?= $selected_month == $k ? 'selected' : '' ?>><?= $v ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div style="width: 120px; flex-shrink: 0;">
+                                <select name="year" class="form-control" onchange="document.getElementById('budgetFilterForm').submit()">
+                                    <?php for ($y = date('Y') - 2; $y <= date('Y') + 1; $y++): ?>
+                                    <option value="<?= $y ?>" <?= $selected_year == $y ? 'selected' : '' ?>><?= $y ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-6">
-                    <div class="p-3 bg-white shadow-sm border" style="border-radius: 14px;">
-                        <span class="text-muted small">Realisasi Pengeluaran</span>
-                        <h5 class="font-weight-bold <?= $total_spent > $total_budget && $total_budget > 0 ? 'text-danger' : 'text-primary' ?> mb-0">
-                            Rp <?= number_format($total_spent, 0, ',', '.') ?>
-                        </h5>
+
+                <div class="col-lg-7 col-md-12">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="p-3 bg-light border-0 shadow-none h-100" style="border-radius: 14px;">
+                                <span class="text-muted small d-block font-weight-bold text-uppercase" style="font-size: 11px;">Total Anggaran</span>
+                                <h4 class="font-weight-bold text-dark mb-0 mt-1" style="font-size: 1.25rem;">Rp <?= number_format($total_budget, 0, ',', '.') ?></h4>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light border-0 shadow-none h-100" style="border-radius: 14px;">
+                                <span class="text-muted small d-block font-weight-bold text-uppercase" style="font-size: 11px;">Realisasi Pengeluaran</span>
+                                <h4 class="font-weight-bold <?= $total_spent > $total_budget && $total_budget > 0 ? 'text-danger' : 'text-primary' ?> mb-0 mt-1" style="font-size: 1.25rem;">
+                                    Rp <?= number_format($total_spent, 0, ',', '.') ?>
+                                </h4>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
