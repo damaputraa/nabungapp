@@ -41,6 +41,9 @@ public function index() {
 }
     
     public function add() {
+        $user_id = $this->session->userdata('user_id');
+        $this->load->model('wallet_model');
+
         if ($this->input->post('amount') !== null) {
             $_POST['amount'] = preg_replace('/[^0-9]/', '', (string) $this->input->post('amount'));
         }
@@ -50,12 +53,16 @@ public function index() {
         $this->form_validation->set_rules('transaction_date', 'Tanggal', 'required');
         
         if ($this->form_validation->run() == FALSE) {
+            $data['wallets'] = $this->wallet_model->get_by_user($user_id);
             $this->template
                 ->page_title('Tambah Transaksi')
-                ->load('transactions/add');
+                ->load('transactions/add', $data);
         } else {
+            $wallet_id = $this->input->post('wallet_id') ? (int)$this->input->post('wallet_id') : null;
+
             $data = [
-                'user_id' => $this->session->userdata('user_id'),
+                'user_id' => $user_id,
+                'wallet_id' => $wallet_id,
                 'type' => $this->input->post('type'),
                 'category' => $this->input->post('category'),
                 'amount' => $this->input->post('amount'),
@@ -68,7 +75,7 @@ public function index() {
                 $config['upload_path'] = './uploads/receipts/';
                 $config['allowed_types'] = 'jpg|jpeg|png|webp';
                 $config['max_size'] = 2048;
-                $config['file_name'] = 'receipt_' . time() . '_' . $this->session->userdata('user_id');
+                $config['file_name'] = 'receipt_' . time() . '_' . $user_id;
 
                 $this->load->library('upload', $config);
                 if ($this->upload->do_upload('receipt_file')) {
@@ -78,6 +85,11 @@ public function index() {
             }
             
             $this->transaction_model->insert($data);
+
+            // Sesuaikan saldo dompet jika dipilih
+            if ($wallet_id) {
+                $this->wallet_model->adjust_balance($wallet_id, $data['amount'], $data['type'] == 'income' ? 'add' : 'subtract');
+            }
 
             // Log activity
             $this->load->model('activity_log_model');
@@ -93,6 +105,7 @@ public function index() {
     
     public function edit($id) {
         $user_id = $this->session->userdata('user_id');
+        $this->load->model('wallet_model');
         $transaction = $this->transaction_model->get_row(['id' => $id, 'user_id' => $user_id]);
         
         if (!$transaction) {
@@ -109,17 +122,32 @@ public function index() {
         
         if ($this->form_validation->run() == FALSE) {
             $data['transaction'] = $transaction;
+            $data['wallets'] = $this->wallet_model->get_by_user($user_id);
             $this->template
                 ->page_title('Edit Transaksi')
                 ->load('transactions/edit', $data);
         } else {
+            $new_wallet_id = $this->input->post('wallet_id') ? (int)$this->input->post('wallet_id') : null;
+            $new_amount = (float) $this->input->post('amount');
+            $new_type = $this->input->post('type');
+
             $update_data = [
-                'type' => $this->input->post('type'),
+                'wallet_id' => $new_wallet_id,
+                'type' => $new_type,
                 'category' => $this->input->post('category'),
-                'amount' => $this->input->post('amount'),
+                'amount' => $new_amount,
                 'description' => $this->input->post('description'),
                 'transaction_date' => $this->input->post('transaction_date')
             ];
+
+            // Revert saldo dompet lama jika ada
+            if (!empty($transaction->wallet_id)) {
+                $this->wallet_model->adjust_balance($transaction->wallet_id, $transaction->amount, $transaction->type == 'income' ? 'subtract' : 'add');
+            }
+            // Tambahkan ke saldo dompet baru jika ada
+            if ($new_wallet_id) {
+                $this->wallet_model->adjust_balance($new_wallet_id, $new_amount, $new_type == 'income' ? 'add' : 'subtract');
+            }
 
             // Upload struk baru jika ada
             if (!empty($_FILES['receipt_file']['name'])) {
@@ -130,7 +158,6 @@ public function index() {
 
                 $this->load->library('upload', $config);
                 if ($this->upload->do_upload('receipt_file')) {
-                    // Hapus gambar lama jika ada
                     if (!empty($transaction->receipt_image) && file_exists('./uploads/receipts/' . $transaction->receipt_image)) {
                         @unlink('./uploads/receipts/' . $transaction->receipt_image);
                     }
@@ -152,9 +179,15 @@ public function index() {
     
     public function delete($id) {
         $user_id = $this->session->userdata('user_id');
+        $this->load->model('wallet_model');
         $transaction = $this->transaction_model->get_row(['id' => $id, 'user_id' => $user_id]);
 
         if ($transaction) {
+            // Revert saldo dompet
+            if (!empty($transaction->wallet_id)) {
+                $this->wallet_model->adjust_balance($transaction->wallet_id, $transaction->amount, $transaction->type == 'income' ? 'subtract' : 'add');
+            }
+
             if (!empty($transaction->receipt_image) && file_exists('./uploads/receipts/' . $transaction->receipt_image)) {
                 @unlink('./uploads/receipts/' . $transaction->receipt_image);
             }

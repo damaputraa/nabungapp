@@ -394,4 +394,25 @@ class Admin extends CI_Controller {
         $this->session->set_flashdata('success', 'Pengumuman berhasil dihapus.');
         redirect('admin/announcements');
     }
+
+    public function backup_db() {
+        $this->load->dbutil();
+        $this->load->helper('download');
+
+        $prefs = [
+            'format' => 'txt',
+            'filename' => 'backup_keuangan_' . date('Y-m-d_H-i-s') . '.sql',
+            'add_drop' => TRUE,
+            'add_insert' => TRUE,
+            'newline' => "\n"
+        ];
+
+        $backup = $this->dbutil->backup($prefs);
+        $file_name = 'backup_keuangan_dams_' . date('Y-m-d_His') . '.sql';
+
+        $this->activity_log_model->log('DATABASE_BACKUP', 'Mengunduh backup database (' . $file_name . ')');
+
+        force_download($file_name, $backup);
+    }
 }
+

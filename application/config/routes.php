@@ -87,7 +87,38 @@ $route['budget/save'] = 'budget/save';
 $route['budget/delete/(:num)'] = 'budget/delete/$1';
 
 // ================================================================
+// WALLETS ROUTES (DOMPET & REKENING)
+// ================================================================
+$route['wallets'] = 'wallets/index';
+$route['wallets/add'] = 'wallets/add';
+$route['wallets/edit/(:num)'] = 'wallets/edit/$1';
+$route['wallets/delete/(:num)'] = 'wallets/delete/$1';
+$route['wallets/transfer'] = 'wallets/transfer';
+
+// ================================================================
+// BILLS ROUTES (PENGINGAT TAGIHAN RUTIN)
+// ================================================================
+$route['bills'] = 'bills/index';
+$route['bills/add'] = 'bills/add';
+$route['bills/pay/(:num)'] = 'bills/pay/$1';
+$route['bills/delete/(:num)'] = 'bills/delete/$1';
+
+// ================================================================
+// SAVINGS CHALLENGES & GAMIFIKASI
+// ================================================================
+$route['challenges'] = 'challenges/index';
+$route['challenges/create'] = 'challenges/create';
+$route['challenges/toggle_step'] = 'challenges/toggle_step';
+$route['challenges/delete/(:num)'] = 'challenges/delete/$1';
+
+// ================================================================
+// ADMIN BACKUP DATABASE
+// ================================================================
+$route['admin/backup_db'] = 'admin/backup_db';
+
+// ================================================================
 // 404 OVERRIDE
 // ================================================================
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+

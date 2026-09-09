@@ -440,6 +440,26 @@ $recent_transactions = array_slice($transactions ?? [], 0, 5);
         </div>
         <?php endif; ?>
 
+        <!-- UPCOMING BILLS ALERT -->
+        <?php if (!empty($upcoming_bills)): ?>
+        <div class="alert alert-warning border-0 shadow-sm p-3 d-flex align-items-center mb-3" style="border-radius: 16px; background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fde68a !important; color: #92400e;">
+            <div style="font-size: 22px; margin-right: 14px;">
+                <i class="fas fa-bell text-warning" style="color: #d97706 !important;"></i>
+            </div>
+            <div class="flex-grow-1">
+                <div class="font-weight-bold" style="font-size: 13px;">Pengingat: Ada <?= count($upcoming_bills) ?> Tagihan Mendekati Jatuh Tempo!</div>
+                <div style="font-size: 12px; color: #b45309;" class="d-flex flex-wrap gap-1 mt-1">
+                    <?php foreach (array_slice($upcoming_bills, 0, 2) as $ub): ?>
+                        <span class="badge badge-light border mr-1"><strong><?= htmlspecialchars($ub->title) ?></strong> (Tgl <?= $ub->due_day ?>) - Rp <?= number_format($ub->amount, 0, ',', '.') ?></span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <a href="<?= site_url('bills') ?>" class="btn btn-sm btn-warning px-3 py-1 font-weight-bold ml-2 text-dark" style="border-radius: 8px; font-size: 11px; background: #f59e0b; border: none; color: #fff !important;">
+                Bayar Sekarang &rarr;
+            </a>
+        </div>
+        <?php endif; ?>
+
         <!-- RESPONSIVE 2-COLUMN GRID -->
         <div class="row">
             
@@ -471,7 +491,36 @@ $recent_transactions = array_slice($transactions ?? [], 0, 5);
                     </div>
                 </div>
 
-                <!-- 2. QUICK ACTIONS (6 Grid Buttons) -->
+                <!-- DOMPET & SUMBER DANA OVERVIEW -->
+                <div class="dash-card mb-3 p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="head-title" style="font-size: 13px;">
+                            <i class="fas fa-wallet text-primary mr-1"></i> Dompet & Sumber Dana
+                        </span>
+                        <a href="<?= site_url('wallets') ?>" class="head-link" style="font-size: 12px;">Kelola (<?= count($wallets ?? []) ?>) &rarr;</a>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <?php if (empty($wallets)): ?>
+                            <small class="text-muted">Belum ada dompet terdaftar.</small>
+                        <?php else: ?>
+                            <?php foreach (array_slice($wallets, 0, 3) as $w): 
+                                $wc = !empty($w->color) ? $w->color : '#2563eb';
+                            ?>
+                            <div class="p-2 border rounded-lg flex-fill" style="min-width: 140px; border-radius: 12px; background: #ffffff; border-left: 4px solid <?= htmlspecialchars($wc) ?> !important;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="font-weight-bold text-dark text-truncate" style="max-width: 110px;"><?= htmlspecialchars($w->name) ?></small>
+                                    <i class="fas <?= !empty($w->icon) ? htmlspecialchars($w->icon) : 'fa-wallet' ?> text-muted" style="font-size: 10px;"></i>
+                                </div>
+                                <div class="font-weight-bold mt-1" style="font-size: 13px; color: <?= htmlspecialchars($wc) ?>;">
+                                    Rp <?= number_format($w->balance, 0, ',', '.') ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 2. QUICK ACTIONS (Grid Buttons) -->
                 <div class="quick-actions-grid">
                     <a href="<?= site_url('transactions/add') ?>" class="action-card-btn">
                         <span class="action-icon text-success">💰</span>
@@ -481,23 +530,32 @@ $recent_transactions = array_slice($transactions ?? [], 0, 5);
                         <span class="action-icon text-danger">💸</span>
                         <span class="action-label">Kas Keluar</span>
                     </a>
-                    <a href="<?= site_url('savings') ?>" class="action-card-btn">
-                        <span class="action-icon text-warning">🏦</span>
-                        <span class="action-label">Setor Nabung</span>
+                    <a href="<?= site_url('wallets') ?>" class="action-card-btn">
+                        <span class="action-icon text-primary">💳</span>
+                        <span class="action-label">Dompet</span>
+                    </a>
+                    <a href="<?= site_url('bills') ?>" class="action-card-btn">
+                        <span class="action-icon text-warning">📑</span>
+                        <span class="action-label">Tagihan</span>
+                    </a>
+                    <a href="<?= site_url('challenges') ?>" class="action-card-btn">
+                        <span class="action-icon text-warning">🏅</span>
+                        <span class="action-label">Tantangan</span>
                     </a>
                     <a href="<?= site_url('goals') ?>" class="action-card-btn">
                         <span class="action-icon text-primary">🎯</span>
-                        <span class="action-label">Kantong Impian</span>
+                        <span class="action-label">Impian</span>
                     </a>
                     <a href="<?= site_url('budget') ?>" class="action-card-btn">
                         <span class="action-icon text-info">📊</span>
                         <span class="action-label">Anggaran</span>
                     </a>
                     <a href="<?= site_url('savings/leaderboard') ?>" class="action-card-btn">
-                        <span class="action-icon text-warning">🏆</span>
-                        <span class="action-label">Leaderboard</span>
+                        <span class="action-icon text-success">🏆</span>
+                        <span class="action-label">Peringkat</span>
                     </a>
                 </div>
+
 
                 <!-- 3. TRANSAKSI TERAKHIR -->
                 <div class="dash-card">
@@ -630,7 +688,48 @@ $recent_transactions = array_slice($transactions ?? [], 0, 5);
                     <?php endif; ?>
                 </div>
 
-                <!-- 6. BUTUH BANTUAN -->
+                <!-- 6. KOMPOSISI PENGELUARAN BULAN INI (DOUGHNUT CHART) -->
+                <div class="dash-card">
+                    <div class="card-head">
+                        <span class="head-title">
+                            <i class="fas fa-chart-pie text-danger"></i> Komposisi Pengeluaran
+                        </span>
+                        <a href="<?= site_url('transactions') ?>" class="head-link">Semua &rarr;</a>
+                    </div>
+                    <div style="min-height: 220px; position: relative;">
+                        <canvas id="chartExpenseCategory" 
+                                style="max-height: 220px; width: 100%;" 
+                                data-categories='<?= htmlspecialchars(json_encode($expense_by_category ?? []), ENT_QUOTES, 'UTF-8') ?>'>
+                        </canvas>
+                    </div>
+                </div>
+
+                <!-- 7. LENCANA PRESTASI & TANTANGAN NABUNG -->
+                <div class="dash-card">
+                    <div class="card-head">
+                        <span class="head-title">
+                            <i class="fas fa-award text-warning"></i> Lencana & Tantangan Nabung
+                        </span>
+                        <a href="<?= site_url('challenges') ?>" class="head-link">Lihat &rarr;</a>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between p-3 rounded bg-light border mb-2" style="border-radius: 14px !important;">
+                        <div class="d-flex align-items-center">
+                            <div class="mr-2" style="font-size: 24px;">🏆</div>
+                            <div>
+                                <div class="font-weight-bold text-dark" style="font-size: 13px;"><?= $badge_summary['unlocked_count'] ?? 0 ?> dari <?= $badge_summary['total_count'] ?? 6 ?> Lencana Terbuka</div>
+                                <small class="text-muted"><?= $badge_summary['percentage'] ?? 0 ?>% Prestasi Finansial</small>
+                            </div>
+                        </div>
+                        <a href="<?= site_url('challenges') ?>" class="btn btn-sm btn-outline-warning text-dark font-weight-bold" style="border-radius: 8px; font-size: 11px;">
+                            Buka Tantangan
+                        </a>
+                    </div>
+                    <div class="progress" style="height: 6px; border-radius: 6px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: <?= $badge_summary['percentage'] ?? 0 ?>%;"></div>
+                    </div>
+                </div>
+
+                <!-- 8. BUTUH BANTUAN -->
                 <div class="support-banner">
                     <div>
                         <h5><i class="fas fa-headset mr-1"></i> Bantuan Sistem</h5>

@@ -101,6 +101,36 @@ class Transaction_model extends MY_Model {
         }
         return $this->db->get($this->table)->row();
     }
+
+    /**
+     * Komposisi pengeluaran per kategori untuk grafik donat pengguna
+     */
+    public function get_expense_by_category($user_id, $month = null, $year = null) {
+        $this->db->select('category, SUM(amount) as total');
+        $this->db->where('user_id', $user_id);
+        $this->db->where('type', 'expense');
+        if ($month) {
+            $this->db->where('MONTH(transaction_date)', (int)$month);
+        }
+        if ($year) {
+            $this->db->where('YEAR(transaction_date)', (int)$year);
+        }
+        $this->db->group_by('category');
+        $this->db->order_by('total', 'DESC');
+        return $this->db->get($this->table)->result();
+    }
+
+    /**
+     * Kategori paling sering digunakan / terbesar di seluruh platform (Admin Intelligence)
+     */
+    public function get_platform_top_categories($type = 'expense', $limit = 6) {
+        $this->db->select('category, SUM(amount) as total, COUNT(id) as count');
+        $this->db->where('type', $type);
+        $this->db->group_by('category');
+        $this->db->order_by('total', 'DESC');
+        $this->db->limit($limit);
+        return $this->db->get($this->table)->result();
+    }
 }
 
 

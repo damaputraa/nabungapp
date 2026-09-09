@@ -15,6 +15,20 @@
 
                 <form action="<?= site_url('transactions/edit/' . $transaction->id) ?>" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
+                        <label>Dompet / Rekening</label>
+                        <select name="wallet_id" class="form-control">
+                            <option value="">-- Tanpa Dompet Khusus --</option>
+                            <?php if (!empty($wallets)): ?>
+                                <?php foreach ($wallets as $w): ?>
+                                    <option value="<?= $w->id ?>" <?= (isset($transaction->wallet_id) && $transaction->wallet_id == $w->id) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($w->name) ?> (Saldo: Rp <?= number_format($w->balance, 0, ',', '.') ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <small class="text-muted">Saldo dompet akan disesuaikan dengan perubahan transaksi.</small>
+                    </div>
+                    <div class="form-group">
                         <label>Jenis Transaksi</label>
                         <select name="type" class="form-control" required>
                             <option value="income" <?= $transaction->type == 'income' ? 'selected' : '' ?>>Pemasukan</option>

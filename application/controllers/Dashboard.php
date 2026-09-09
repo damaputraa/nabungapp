@@ -74,8 +74,11 @@ class Dashboard extends CI_Controller {
             $recent_platform_transactions = array_slice($all_trx, 0, 8);
         }
         
-        // ========== NOTIFIKASI & PENGUMUMAN ==========
-        $this->load->model(['notification_model', 'savings_goal_model', 'budget_model', 'announcement_model']);
+        // ========== NOTIFIKASI, PENGUMUMAN & FITUR BARU ==========
+        $this->load->model([
+            'notification_model', 'savings_goal_model', 'budget_model', 
+            'announcement_model', 'wallet_model', 'bill_model', 'achievement_model'
+        ]);
         $notification = $this->notification_model->check_savings_progress(
             $user_id, 
             $savings_total_deposit, 
@@ -84,11 +87,19 @@ class Dashboard extends CI_Controller {
         
         $announcements = $this->announcement_model->get_active();
         $platform_savings_trend = ($role === 'admin') ? $this->savings_model->get_platform_trend_months(6) : [];
+        $platform_top_categories = ($role === 'admin') ? $this->transaction_model->get_platform_top_categories(5) : [];
 
         // Data Kantong Impian & Anggaran Kategori
         $user_goals = $this->savings_goal_model->get_by_user($user_id, 'active');
         $goals_summary = $this->savings_goal_model->get_summary_user($user_id);
         $overbudgets = $this->budget_model->check_overbudgets($user_id, $current_month, $current_year);
+
+        // Data Dompet & Tagihan & Gamifikasi (User)
+        $user_wallets = $this->wallet_model->get_by_user($user_id);
+        $wallets_total_balance = $this->wallet_model->get_total_balance($user_id);
+        $upcoming_bills = $this->bill_model->get_upcoming($user_id, 7);
+        $expense_by_category = $this->transaction_model->get_expense_by_category($user_id, $current_month, $current_year);
+        $badge_summary = $this->achievement_model->get_user_badges($user_id);
         
         // ========== SIAPKAN DATA UNTUK VIEW ==========
         $data = [
@@ -105,6 +116,7 @@ class Dashboard extends CI_Controller {
             'all_users_savings' => $all_users_savings,
             'platform_stats' => $platform_stats,
             'platform_savings_trend' => $platform_savings_trend,
+            'platform_top_categories' => $platform_top_categories,
             'recent_platform_transactions' => $recent_platform_transactions,
             // Notifikasi & Pengumuman
             'notification' => $notification,
@@ -114,7 +126,13 @@ class Dashboard extends CI_Controller {
             // Kantong Impian & Anggaran
             'user_goals' => $user_goals,
             'goals_summary' => $goals_summary,
-            'overbudgets' => $overbudgets
+            'overbudgets' => $overbudgets,
+            // Fitur Baru Phase 3
+            'wallets' => $user_wallets,
+            'wallets_total_balance' => $wallets_total_balance,
+            'upcoming_bills' => $upcoming_bills,
+            'expense_by_category' => $expense_by_category,
+            'badge_summary' => $badge_summary
         ];
         
         // ========== PILIH TAMPILAN BERDASARKAN ROLE ==========
@@ -130,6 +148,8 @@ class Dashboard extends CI_Controller {
             $this->template
                 ->page_title('Dashboard')
                 ->hide_header()
+                ->plugins(['chartjs'])
+                ->page_js(['assets/js/dashboard.js'])
                 ->load('dashboard/user_dashboard', $data);
         }
     }

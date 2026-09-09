@@ -18,6 +18,9 @@ $p_stats = $platform_stats ?? [];
                     </p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
+                    <a href="<?= site_url('admin/backup_db') ?>" class="btn btn-success font-weight-bold mr-2 mb-2 shadow-sm text-white" style="background: #10b981; border-color: #10b981;">
+                        <i class="fas fa-database mr-1"></i> Backup Database (.sql)
+                    </a>
                     <a href="<?= site_url('admin/users') ?>" class="btn btn-light font-weight-bold mr-2 mb-2 shadow-sm text-primary">
                         <i class="fas fa-user-plus mr-1"></i> Kelola User
                     </a>
@@ -154,10 +157,10 @@ $p_stats = $platform_stats ?? [];
     </div>
 </div>
 
-<!-- GRAFIK TREN PERTUMBUHAN TABUNGAN PLATFORM (6 BULAN) -->
+<!-- GRAFIK TREN PERTUMBUHAN & TOP KATEGORI PLATFORM -->
 <div class="row">
-    <div class="col-12">
-        <div class="card card-primary card-outline shadow-sm">
+    <div class="col-lg-8 mb-4">
+        <div class="card card-primary card-outline shadow-sm h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title font-weight-bold" style="color: #1e293b;">
                     <i class="fas fa-chart-line mr-2 text-primary"></i> Tren Pertumbuhan Tabungan Platform (6 Bulan Terakhir)
@@ -174,7 +177,23 @@ $p_stats = $platform_stats ?? [];
             </div>
         </div>
     </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card card-warning card-outline shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title font-weight-bold" style="color: #1e293b;">
+                    <i class="fas fa-tags mr-2 text-warning"></i> Top 5 Kategori Platform
+                </h3>
+            </div>
+            <div class="card-body" style="min-height: 290px;">
+                <canvas id="chartPlatformCategories"
+                        style="height: 240px; width: 100%;"
+                        data-categories='<?= htmlspecialchars(json_encode($platform_top_categories ?? []), ENT_QUOTES, 'UTF-8') ?>'>
+                </canvas>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <!-- RINGKASAN TABUNGAN SELURUH USER -->
 <div class="row">

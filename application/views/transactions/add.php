@@ -15,6 +15,20 @@
 
                 <form action="<?= site_url('transactions/add') ?>" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
+                        <label>Dompet / Rekening</label>
+                        <select name="wallet_id" class="form-control">
+                            <option value="">-- Pilih Dompet (Opsional) --</option>
+                            <?php if (!empty($wallets)): ?>
+                                <?php foreach ($wallets as $w): ?>
+                                    <option value="<?= $w->id ?>" <?= $w->is_default ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($w->name) ?> (Saldo: Rp <?= number_format($w->balance, 0, ',', '.') ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <small class="text-muted">Saldo dompet terpilih akan otomatis disesuaikan.</small>
+                    </div>
+                    <div class="form-group">
                         <label>Jenis Transaksi</label>
                         <select name="type" class="form-control" required>
                             <option value="">-- Pilih --</option>

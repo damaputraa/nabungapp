@@ -22,39 +22,49 @@ $is_admin = (strtolower(trim((string)$this->session->userdata('role'))) === 'adm
             </a>
         </li>
         <!-- Desktop Nav Links untuk Pengguna Biasa -->
-        <li class="nav-item d-none d-md-inline-block">
-            <a href="<?= site_url('dashboard') ?>" class="nav-link <?= $this->uri->segment(1) == 'dashboard' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 14px;">
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('dashboard') ?>" class="nav-link <?= $this->uri->segment(1) == 'dashboard' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
                 <i class="fas fa-home mr-1"></i> Beranda
             </a>
         </li>
-        <li class="nav-item d-none d-md-inline-block">
-            <a href="<?= site_url('transactions') ?>" class="nav-link <?= $this->uri->segment(1) == 'transactions' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 14px;">
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('transactions') ?>" class="nav-link <?= $this->uri->segment(1) == 'transactions' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
                 <i class="fas fa-exchange-alt mr-1"></i> Transaksi
             </a>
         </li>
-        <li class="nav-item d-none d-md-inline-block">
-            <a href="<?= site_url('savings') ?>" class="nav-link <?= ($this->uri->segment(1) == 'savings' && $this->uri->segment(2) != 'leaderboard') ? 'font-weight-bold text-success' : '' ?>" style="font-size: 14px;">
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('wallets') ?>" class="nav-link <?= $this->uri->segment(1) == 'wallets' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
+                <i class="fas fa-wallet mr-1"></i> Dompet
+            </a>
+        </li>
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('bills') ?>" class="nav-link <?= $this->uri->segment(1) == 'bills' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
+                <i class="fas fa-file-invoice mr-1"></i> Tagihan
+            </a>
+        </li>
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('savings') ?>" class="nav-link <?= ($this->uri->segment(1) == 'savings' && $this->uri->segment(2) != 'leaderboard') ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
                 <i class="fas fa-piggy-bank mr-1"></i> Tabungan
             </a>
         </li>
-        <li class="nav-item d-none d-md-inline-block">
-            <a href="<?= site_url('goals') ?>" class="nav-link <?= $this->uri->segment(1) == 'goals' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 14px;">
-                <i class="fas fa-bullseye mr-1"></i> Kantong Impian
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('goals') ?>" class="nav-link <?= $this->uri->segment(1) == 'goals' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
+                <i class="fas fa-bullseye mr-1"></i> Impian
             </a>
         </li>
-        <li class="nav-item d-none d-md-inline-block">
-            <a href="<?= site_url('budget') ?>" class="nav-link <?= $this->uri->segment(1) == 'budget' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 14px;">
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('budget') ?>" class="nav-link <?= $this->uri->segment(1) == 'budget' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
                 <i class="fas fa-chart-pie mr-1"></i> Anggaran
             </a>
         </li>
-        <li class="nav-item d-none d-md-inline-block">
-            <a href="<?= site_url('savings/leaderboard') ?>" class="nav-link <?= $this->uri->segment(2) == 'leaderboard' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 14px;">
-                <i class="fas fa-trophy mr-1"></i> Leaderboard
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('challenges') ?>" class="nav-link <?= $this->uri->segment(1) == 'challenges' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
+                <i class="fas fa-award mr-1"></i> Tantangan
             </a>
         </li>
-        <li class="nav-item d-none d-md-inline-block">
-            <a href="<?= site_url('laporan') ?>" class="nav-link <?= $this->uri->segment(1) == 'laporan' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 14px;">
-                <i class="fas fa-file-invoice-dollar mr-1"></i> Rekening Koran
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="<?= site_url('laporan') ?>" class="nav-link <?= $this->uri->segment(1) == 'laporan' ? 'font-weight-bold text-success' : '' ?>" style="font-size: 13px;">
+                <i class="fas fa-file-invoice-dollar mr-1"></i> Laporan
             </a>
         </li>
         <?php endif; ?>
@@ -142,6 +152,27 @@ $is_admin = (strtolower(trim((string)$this->session->userdata('role'))) === 'adm
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="<?= site_url('wallets') ?>" class="nav-link <?= $this->uri->segment(1) == 'wallets' ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-wallet"></i>
+                        <p>Dompet & Bank</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="<?= site_url('bills') ?>" class="nav-link <?= $this->uri->segment(1) == 'bills' ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-file-invoice"></i>
+                        <p>Pengingat Tagihan</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="<?= site_url('challenges') ?>" class="nav-link <?= $this->uri->segment(1) == 'challenges' ? 'active' : '' ?>">
+                        <i class="nav-icon fas fa-award"></i>
+                        <p>Tantangan Nabung</p>
+                    </a>
+                </li>
+
                 <!-- ==================== -->
                 <!-- MENU PROFIL -->
                 <!-- ==================== -->
@@ -203,6 +234,13 @@ $is_admin = (strtolower(trim((string)$this->session->userdata('role'))) === 'adm
                     <a href="<?= site_url('admin/logs') ?>" class="nav-link <?= $this->uri->segment(2) == 'logs' ? 'active' : '' ?>">
                         <i class="nav-icon fas fa-history"></i>
                         <p>Log Aktivitas (Audit)</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="<?= site_url('admin/backup_db') ?>" class="nav-link">
+                        <i class="nav-icon fas fa-database text-success"></i>
+                        <p>Backup Database (.sql)</p>
                     </a>
                 </li>
             </ul>

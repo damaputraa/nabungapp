@@ -114,16 +114,16 @@
         <span class="nav-label">Transaksi</span>
     </a>
     
-    <a href="<?= site_url('savings') ?>" 
-       class="nav-item <?= $this->uri->segment(1) == 'savings' ? 'active' : '' ?>">
-        <span class="nav-icon"><i class="fas fa-piggy-bank"></i></span>
-        <span class="nav-label">Tabungan</span>
+    <a href="<?= site_url('wallets') ?>" 
+       class="nav-item <?= $this->uri->segment(1) == 'wallets' ? 'active' : '' ?>">
+        <span class="nav-icon"><i class="fas fa-wallet"></i></span>
+        <span class="nav-label">Dompet</span>
     </a>
 
-	    <a href="<?= site_url('savings/leaderboard') ?>" 
-       class="nav-item <?= $this->uri->segment(2) == 'leaderboard' ? 'active' : '' ?>">
-        <span class="nav-icon"><i class="fas fa-trophy"></i></span>
-        <span class="nav-label">Leaderboard</span>
+    <a href="<?= site_url('savings') ?>" 
+       class="nav-item <?= ($this->uri->segment(1) == 'savings' && $this->uri->segment(2) != 'leaderboard') ? 'active' : '' ?>">
+        <span class="nav-icon"><i class="fas fa-piggy-bank"></i></span>
+        <span class="nav-label">Tabungan</span>
     </a>
     
     <a href="<?= site_url('profile') ?>" 
