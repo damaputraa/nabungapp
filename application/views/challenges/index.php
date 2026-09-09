@@ -50,17 +50,23 @@
         <div class="card-body p-4">
             <div class="row">
                 <?php foreach ($badges as $badge): 
-                    $is_unlocked = $badge['unlocked'];
+                    $is_unlocked = !empty($badge['unlocked']);
+                    $b_name = $badge['title'] ?? $badge['name'] ?? 'Lencana';
+                    $b_desc = $badge['description'] ?? $badge['desc'] ?? '';
+                    $b_color = $badge['color'] ?? '#3b82f6';
+                    $b_icon = $badge['icon'] ?? 'fa-medal';
+                    $b_progress = $badge['progress'] ?? 0;
+                    $b_progress_text = $badge['progress_text'] ?? (isset($badge['current'], $badge['target']) ? ($badge['current'] . ' / ' . $badge['target']) : '');
                 ?>
                 <div class="col-12 col-md-6 col-lg-4 mb-3">
                     <div class="card border h-100 p-3 shadow-xs" style="border-radius: 16px; <?= $is_unlocked ? 'background: linear-gradient(135deg, #fffbeb, #ffffff); border-color: #fde68a !important;' : 'background: #f8fafc; opacity: 0.85;' ?>">
                         <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 52px; height: 52px; border-radius: 16px; background-color: <?= $is_unlocked ? $badge['color'] : '#94a3b8' ?>; color: #fff; font-size: 1.4rem; flex-shrink: 0;">
-                                <i class="fas <?= $badge['icon'] ?>"></i>
+                            <div class="d-flex align-items-center justify-content-center mr-3 shadow-sm" style="width: 52px; height: 52px; border-radius: 16px; background-color: <?= $is_unlocked ? $b_color : '#94a3b8' ?>; color: #fff; font-size: 1.4rem; flex-shrink: 0;">
+                                <i class="fas <?= $b_icon ?>"></i>
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <h6 class="font-weight-bold mb-0 <?= $is_unlocked ? 'text-dark' : 'text-muted' ?>"><?= htmlspecialchars($badge['name']) ?></h6>
+                                    <h6 class="font-weight-bold mb-0 <?= $is_unlocked ? 'text-dark' : 'text-muted' ?>"><?= htmlspecialchars($b_name) ?></h6>
                                     <?php if ($is_unlocked): ?>
                                         <span class="badge badge-success px-2 py-1" style="border-radius: 6px; font-size: 0.65rem;">
                                             <i class="fas fa-check"></i> Terbuka
@@ -71,15 +77,15 @@
                                         </span>
                                     <?php endif; ?>
                                 </div>
-                                <p class="small text-muted mb-2" style="font-size: 0.78rem; line-height: 1.3;"><?= htmlspecialchars($badge['desc']) ?></p>
+                                <p class="small text-muted mb-2" style="font-size: 0.78rem; line-height: 1.3;"><?= htmlspecialchars($b_desc) ?></p>
                                 
                                 <?php if (!$is_unlocked): ?>
                                 <div class="progress" style="height: 5px; border-radius: 6px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: <?= $badge['progress'] ?>%;"></div>
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: <?= $b_progress ?>%;"></div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-1" style="font-size: 0.7rem; color: #64748b;">
                                     <span>Progres</span>
-                                    <span><?= $badge['current'] ?> / <?= $badge['target'] ?></span>
+                                    <span><?= htmlspecialchars($b_progress_text) ?></span>
                                 </div>
                                 <?php endif; ?>
                             </div>

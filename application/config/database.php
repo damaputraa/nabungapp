@@ -73,16 +73,55 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
+// ================================================================
+// DETEKSI OTOMATIS LINGKUNGAN (LOKAL VS HOSTING / PRODUCTION)
+// ================================================================
+$is_local = false;
+
+if (isset($_SERVER['HTTP_HOST'])) {
+    $host = strtolower($_SERVER['HTTP_HOST']);
+    if ($host === 'localhost' || 
+        $host === '127.0.0.1' || 
+        $host === '::1' || 
+        strpos($host, 'localhost:') === 0 || 
+        strpos($host, '127.0.0.1:') === 0 || 
+        substr($host, -5) === '.test' || 
+        substr($host, -6) === '.local') {
+        $is_local = true;
+    }
+} elseif (php_sapi_name() === 'cli' || empty($_SERVER['SERVER_NAME'])) {
+    // Jika dijalankan via Terminal / CLI / Cron Job lokal
+    if (strpos(__FILE__, 'laragon') !== false || 
+        strpos(__FILE__, 'xampp') !== false || 
+        strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $is_local = true;
+    }
+}
+
+if ($is_local) {
+    // Database Lokal (Laragon / PC Developer)
+    $db_host = 'localhost';
+    $db_user = 'root';
+    $db_pass = '';
+    $db_name = 'db_keuangan';
+} else {
+    // Database Hosting / Server Online
+    $db_host = 'localhost';
+    $db_user = 'damm5992_nabung';
+    $db_pass = '$Z(]^O0^#-NG]kmX';
+    $db_name = 'damm5992_nabung';
+}
+
 $db['default'] = array(
     'dsn'   => '',
-    'hostname' => 'localhost',
-    'username' => 'root',
-    'password' => '',
-    'database' => 'db_keuangan',
+    'hostname' => $db_host,
+    'username' => $db_user,
+    'password' => $db_pass,
+    'database' => $db_name,
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
-    'db_debug' => (ENVIRONMENT !== 'production'),
+    'db_debug' => (defined('ENVIRONMENT') && ENVIRONMENT !== 'production'),
     'cache_on' => FALSE,
     'cachedir' => '',
     'char_set' => 'utf8',
@@ -94,3 +133,4 @@ $db['default'] = array(
     'failover' => array(),
     'save_queries' => TRUE
 );
+

@@ -53,7 +53,20 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+if (isset($_SERVER['CI_ENV'])) {
+	define('ENVIRONMENT', $_SERVER['CI_ENV']);
+} else {
+	$is_local_env = false;
+	if (isset($_SERVER['HTTP_HOST'])) {
+		$h = strtolower($_SERVER['HTTP_HOST']);
+		if ($h === 'localhost' || $h === '127.0.0.1' || $h === '::1' || strpos($h, 'localhost:') === 0 || strpos($h, '127.0.0.1:') === 0 || substr($h, -5) === '.test' || substr($h, -6) === '.local') {
+			$is_local_env = true;
+		}
+	} elseif (php_sapi_name() === 'cli') {
+		$is_local_env = true;
+	}
+	define('ENVIRONMENT', $is_local_env ? 'development' : 'production');
+}
 
 /*
  *---------------------------------------------------------------

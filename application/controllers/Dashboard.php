@@ -41,10 +41,15 @@ class Dashboard extends CI_Controller {
         
         if ($role == 'admin') {
             $all_users = $this->user_model->get_all();
+            $platform_target_sum = 0;
+            $platform_deposit_sum = 0;
             foreach ($all_users as $user) {
                 $target = $this->savings_target_model->get_or_create($user->id, $current_month, $current_year);
                 $total_deposit = (float) $this->savings_model->get_total_by_user_month($user->id, $current_month, $current_year);
                 $total_user_all = (float) $this->savings_model->get_total_by_user($user->id);
+                
+                $platform_target_sum += (float) ($target->target_amount ?? 0);
+                $platform_deposit_sum += $total_deposit;
                 
                 $all_users_savings[] = (object) [
                     'id' => $user->id,
@@ -63,6 +68,8 @@ class Dashboard extends CI_Controller {
                 'total_users' => count($all_users),
                 'platform_total_savings' => (float) $this->savings_model->get_total_platform(),
                 'platform_month_savings' => (float) $this->savings_model->get_total_platform_month($current_month, $current_year),
+                'platform_month_target' => $platform_target_sum,
+                'platform_month_deposit' => $platform_deposit_sum,
                 'platform_month_income' => (float) ($platform_summary->total_income ?? 0),
                 'platform_month_expense' => (float) ($platform_summary->total_expense ?? 0),
                 'platform_month_balance' => (float) ($platform_summary->balance ?? 0),
@@ -104,6 +111,7 @@ class Dashboard extends CI_Controller {
         // ========== SIAPKAN DATA UNTUK VIEW ==========
         $data = [
             'title' => 'Dashboard',
+            'role' => $role,
             'summary' => $summary,
             'total_income' => $total_income,
             'total_expense' => $total_expense,

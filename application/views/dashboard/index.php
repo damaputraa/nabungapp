@@ -1,6 +1,7 @@
 <?php
 $username = $this->session->userdata('username') ?? 'Admin';
 $p_stats = $platform_stats ?? [];
+$role = $role ?? $this->session->userdata('role') ?? 'user';
 ?>
 
 <!-- Header Sambutan Admin -->
@@ -122,36 +123,38 @@ $p_stats = $platform_stats ?? [];
 
 <!-- GRAFIK CHART.JS -->
 <div class="row">
-    <div class="col-lg-6">
-        <div class="card card-primary shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-white font-weight-bold">
-                    <i class="fas fa-chart-pie mr-2"></i> Pemasukan vs Pengeluaran Bulan Ini
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100" style="border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%); padding: 14px 20px;">
+                <h3 class="card-title text-white font-weight-bold mb-0" style="font-size: 15px;">
+                    <i class="fas fa-chart-pie mr-2"></i> <?= ($role === 'admin') ? 'Pemasukan vs Pengeluaran Platform Bulan Ini' : 'Pemasukan vs Pengeluaran Bulan Ini' ?>
                 </h3>
             </div>
-            <div class="card-body" style="min-height: 290px;">
-                <canvas id="chartIncomeExpense" 
-                        style="height: 250px; width: 100%;"
-                        data-income="<?= (int) ($p_stats['platform_month_income'] ?? $total_income ?? 0) ?>"
-                        data-expense="<?= (int) ($p_stats['platform_month_expense'] ?? $total_expense ?? 0) ?>">
-                </canvas>
+            <div class="card-body" style="padding: 20px;">
+                <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="chartIncomeExpense" 
+                            data-income="<?= (int) ($p_stats['platform_month_income'] ?? $total_income ?? 0) ?>"
+                            data-expense="<?= (int) ($p_stats['platform_month_expense'] ?? $total_expense ?? 0) ?>">
+                    </canvas>
+                </div>
             </div>
         </div>
     </div>
     
-    <div class="col-lg-6">
-        <div class="card card-success shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title text-white font-weight-bold">
-                    <i class="fas fa-chart-bar mr-2"></i> Realisasi vs Target Tabungan Pribadi Admin
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100" style="border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 14px 20px;">
+                <h3 class="card-title text-white font-weight-bold mb-0" style="font-size: 15px;">
+                    <i class="fas fa-chart-bar mr-2"></i> <?= ($role === 'admin') ? 'Target vs Setoran Tabungan Seluruh Pengguna' : 'Target vs Realisasi Tabungan Pribadi' ?>
                 </h3>
             </div>
-            <div class="card-body" style="min-height: 290px;">
-                <canvas id="chartSavings"
-                        style="height: 250px; width: 100%;"
-                        data-target="<?= (int) ($savings_target->target_amount ?? 0) ?>"
-                        data-deposit="<?= (int) ($savings_total_deposit ?? 0) ?>">
-                </canvas>
+            <div class="card-body" style="padding: 20px;">
+                <div class="chart-container" style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="chartSavings"
+                            data-target="<?= (int) (($role === 'admin') ? ($p_stats['platform_month_target'] ?? 0) : ($savings_target->target_amount ?? 0)) ?>"
+                            data-deposit="<?= (int) (($role === 'admin') ? ($p_stats['platform_month_deposit'] ?? 0) : ($savings_total_deposit ?? 0)) ?>">
+                    </canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -160,35 +163,40 @@ $p_stats = $platform_stats ?? [];
 <!-- GRAFIK TREN PERTUMBUHAN & TOP KATEGORI PLATFORM -->
 <div class="row">
     <div class="col-lg-8 mb-4">
-        <div class="card card-primary card-outline shadow-sm h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title font-weight-bold" style="color: #1e293b;">
-                    <i class="fas fa-chart-line mr-2 text-primary"></i> Tren Pertumbuhan Tabungan Platform (6 Bulan Terakhir)
+        <div class="card shadow-sm h-100" style="border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); padding: 14px 20px;">
+                <h3 class="card-title font-weight-bold text-white mb-0" style="font-size: 15px;">
+                    <i class="fas fa-chart-line mr-2"></i> Tren Pertumbuhan Tabungan Platform (6 Bulan Terakhir)
                 </h3>
-                <span class="badge badge-primary px-3 py-1 font-weight-normal" style="font-size: 12px; border-radius: 20px;">
+                <span class="badge px-3 py-1 font-weight-bold" style="font-size: 11px; border-radius: 20px; background: rgba(255, 255, 255, 0.2); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.35); backdrop-filter: blur(4px);">
                     Platform-wide Growth
                 </span>
             </div>
-            <div class="card-body" style="min-height: 290px;">
-                <canvas id="chartPlatformTrend"
-                        style="height: 260px; width: 100%;"
-                        data-trend='<?= htmlspecialchars(json_encode($platform_savings_trend ?? []), ENT_QUOTES, 'UTF-8') ?>'>
-                </canvas>
+            <div class="card-body" style="padding: 20px;">
+                <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
+                    <canvas id="chartPlatformTrend"
+                            data-trend='<?= htmlspecialchars(json_encode($platform_savings_trend ?? []), ENT_QUOTES, 'UTF-8') ?>'>
+                    </canvas>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-lg-4 mb-4">
-        <div class="card card-warning card-outline shadow-sm h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title font-weight-bold" style="color: #1e293b;">
-                    <i class="fas fa-tags mr-2 text-warning"></i> Top 5 Kategori Platform
+        <div class="card shadow-sm h-100" style="border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); padding: 14px 20px;">
+                <h3 class="card-title font-weight-bold text-white mb-0" style="font-size: 15px;">
+                    <i class="fas fa-tags mr-2"></i> Top 5 Kategori Platform
                 </h3>
+                <span class="badge px-3 py-1 font-weight-bold" style="font-size: 11px; border-radius: 20px; background: rgba(255, 255, 255, 0.2); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.35);">
+                    Akumulasi
+                </span>
             </div>
-            <div class="card-body" style="min-height: 290px;">
-                <canvas id="chartPlatformCategories"
-                        style="height: 240px; width: 100%;"
-                        data-categories='<?= htmlspecialchars(json_encode($platform_top_categories ?? []), ENT_QUOTES, 'UTF-8') ?>'>
-                </canvas>
+            <div class="card-body" style="padding: 20px;">
+                <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
+                    <canvas id="chartPlatformCategories"
+                            data-categories='<?= htmlspecialchars(json_encode($platform_top_categories ?? []), ENT_QUOTES, 'UTF-8') ?>'>
+                    </canvas>
+                </div>
             </div>
         </div>
     </div>

@@ -82,17 +82,18 @@ document.addEventListener('DOMContentLoaded', function() {
             new Chart(canvas2.getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: ['Target', 'Realisasi'],
+                    labels: ['Target', 'Setoran Masuk'],
                     datasets: [{
                         label: 'Tabungan',
                         data: [target, deposit],
                         backgroundColor: [
-                            'rgba(37, 99, 235, 0.7)',
-                            'rgba(16, 185, 129, 0.7)'
+                            'rgba(37, 99, 235, 0.85)',
+                            'rgba(16, 185, 129, 0.85)'
                         ],
-                        borderColor: ['#2563eb', '#10b981'],
-                        borderWidth: 2,
-                        borderRadius: 8
+                        borderColor: ['#1d4ed8', '#059669'],
+                        borderWidth: 1.5,
+                        borderRadius: 10,
+                        maxBarThickness: 65
                     }]
                 },
                 options: {
@@ -103,6 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             display: false
                         },
                         tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { size: 13, weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
                             callbacks: {
                                 label: function(context) {
                                     var val = context.parsed.y || 0;
@@ -115,14 +121,32 @@ document.addEventListener('DOMContentLoaded', function() {
                         y: {
                             beginAtZero: true,
                             ticks: {
+                                color: '#64748b',
+                                font: { size: 11 },
                                 callback: function(value) {
-                                    if (value >= 1000000) {
-                                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                                    if (value >= 1000000000) {
+                                        return 'Rp ' + (value / 1000000000).toLocaleString('id-ID', {maximumFractionDigits: 1}) + ' Miliar';
+                                    } else if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000).toLocaleString('id-ID', {maximumFractionDigits: 1}) + ' Jt';
                                     } else if (value >= 1000) {
-                                        return 'Rp ' + (value / 1000) + 'K';
+                                        return 'Rp ' + (value / 1000).toLocaleString('id-ID', {maximumFractionDigits: 0}) + ' Rb';
                                     }
                                     return 'Rp ' + value;
                                 }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#334155',
+                                font: { size: 12, weight: '600' }
                             }
                         }
                     }
@@ -144,11 +168,12 @@ document.addEventListener('DOMContentLoaded', function() {
             var trendData = JSON.parse(trendRaw);
             
             var labels = trendData.map(function(item) { return item.label; });
-            var values = trendData.map(function(item) { return item.total; });
+            var values = trendData.map(function(item) { return parseFloat(item.total) || 0; });
 
             var ctxTrend = canvasTrend.getContext('2d');
             var gradient = ctxTrend.createLinearGradient(0, 0, 0, 300);
             gradient.addColorStop(0, 'rgba(37, 99, 235, 0.35)');
+            gradient.addColorStop(0.7, 'rgba(37, 99, 235, 0.08)');
             gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
 
             new Chart(ctxTrend, {
@@ -159,30 +184,53 @@ document.addEventListener('DOMContentLoaded', function() {
                         label: 'Total Tabungan Masuk (Rp)',
                         data: values,
                         borderColor: '#2563eb',
+                        borderWidth: 3,
                         backgroundColor: gradient,
                         fill: true,
                         tension: 0.35,
                         pointBackgroundColor: '#2563eb',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        pointHoverBackgroundColor: '#1d4ed8',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
                     plugins: {
                         legend: {
                             display: true,
                             position: 'top',
+                            align: 'center',
                             labels: {
                                 usePointStyle: true,
-                                boxWidth: 8
+                                pointStyle: 'circle',
+                                boxWidth: 8,
+                                padding: 16,
+                                font: { size: 12, weight: '600' },
+                                color: '#1e293b'
                             }
                         },
                         tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                            titleFont: { size: 13, weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            boxPadding: 4,
                             callbacks: {
+                                title: function(items) {
+                                    return 'Periode: ' + items[0].label;
+                                },
                                 label: function(context) {
                                     var val = context.parsed.y || 0;
                                     return ' Tabungan: Rp ' + new Intl.NumberFormat('id-ID').format(val);
@@ -194,22 +242,33 @@ document.addEventListener('DOMContentLoaded', function() {
                         y: {
                             beginAtZero: true,
                             ticks: {
+                                color: '#64748b',
+                                font: { size: 11, weight: '500' },
+                                maxTicksLimit: 7,
                                 callback: function(value) {
-                                    if (value >= 1000000) {
-                                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                                    if (value >= 1000000000) {
+                                        return 'Rp ' + (value / 1000000000).toLocaleString('id-ID', {maximumFractionDigits: 1}) + ' Miliar';
+                                    } else if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000).toLocaleString('id-ID', {maximumFractionDigits: 1}) + ' Jt';
                                     } else if (value >= 1000) {
-                                        return 'Rp ' + (value / 1000).toFixed(0) + 'K';
+                                        return 'Rp ' + (value / 1000).toLocaleString('id-ID', {maximumFractionDigits: 0}) + ' Rb';
                                     }
                                     return 'Rp ' + value;
                                 }
                             },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
                             }
                         },
                         x: {
                             grid: {
-                                display: false
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#334155',
+                                font: { size: 12, weight: '600' }
                             }
                         }
                     }

@@ -11,6 +11,13 @@ $is_admin = ($role === 'admin');
     <title><?= $page_title ?? 'Dashboard' ?> | Yuk Nabung</title>
     
     <!-- ============================================================ -->
+    <!-- ANTI-CACHE META TAGS (Mencegah Stale Cache saat F5)          -->
+    <!-- ============================================================ -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- ============================================================ -->
     <!-- PWA META TAGS - Yuk Nabung -->
     <!-- ============================================================ -->
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
@@ -20,17 +27,21 @@ $is_admin = ($role === 'admin');
     <link rel="apple-touch-icon" href="<?= base_url('assets/img/icon-192x192.png') ?>">
     
     <!-- ============================================================ -->
-    <!-- SERVICE WORKER REGISTRATION -->
+    <!-- SERVICE WORKER REGISTRATION & AUTO-UPDATE                   -->
     <!-- ============================================================ -->
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-            navigator.serviceWorker.register('<?= base_url('sw.js') ?>')
+            navigator.serviceWorker.register('<?= base_url('sw.js?v=' . (file_exists(FCPATH . 'sw.js') ? filemtime(FCPATH . 'sw.js') : time())) ?>')
                 .then(function(registration) {
-                    console.log('✅ Service Worker registered successfully');
+                    // Paksa update service worker agar perubahan langsung terpasang
+                    registration.update();
+                    if (registration.waiting) {
+                        registration.waiting.postMessage('skipWaiting');
+                    }
                 })
                 .catch(function(error) {
-                    console.log('❌ Service Worker registration failed:', error);
+                    console.log('Service Worker status:', error);
                 });
         });
     }
@@ -74,8 +85,10 @@ $is_admin = ($role === 'admin');
     <!-- ============================================================ -->
     <!-- PAGE CSS (dari controller) -->
     <!-- ============================================================ -->
-    <?php foreach ($page_css ?? [] as $css): ?>
-    <link rel="stylesheet" href="<?= base_url($css) ?>">
+    <?php foreach ($page_css ?? [] as $css): 
+        $css_ver = file_exists(FCPATH . $css) ? filemtime(FCPATH . $css) : time();
+    ?>
+    <link rel="stylesheet" href="<?= base_url($css . '?v=' . $css_ver) ?>">
     <?php endforeach; ?>
 </head>
 <body class="hold-transition <?= $is_admin ? 'sidebar-mini' : 'user-mode' ?>">

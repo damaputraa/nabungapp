@@ -79,6 +79,11 @@ class Template {
      * Load template with content
      */
     public function load($view, $data = array()) {
+        // Mencegah browser melakukan stale-cache pada F5 untuk halaman dinamis
+        $this->_CI->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0");
+        $this->_CI->output->set_header("Pragma: no-cache");
+        $this->_CI->output->set_header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
         // Siapkan data untuk view
         $data['page_title'] = $this->_page_title;
         $data['page_css'] = $this->_page_css;

@@ -20,6 +20,10 @@ class Admin extends CI_Controller {
         }
     }
     
+    public function index() {
+        redirect('admin/users');
+    }
+    
     public function users() {
         $users = $this->user_model->get_all();
         

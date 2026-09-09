@@ -44,6 +44,7 @@ $route['savings/view_user/(:num)'] = 'savings/view_user/$1';
 // ================================================================
 // ADMIN ROUTES
 // ================================================================
+$route['admin'] = 'admin/index';
 $route['admin/login'] = 'admin/login';
 $route['admin/logout'] = 'admin/logout';
 $route['admin/users'] = 'admin/users';

@@ -66,17 +66,23 @@ class Savings_model extends MY_Model {
 
     public function get_platform_trend_months($limit = 6) {
         $trend = [];
+        $indonesian_months = [
+            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
+            5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu',
+            9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
+        ];
+
         for ($i = $limit - 1; $i >= 0; $i--) {
-            $date = new DateTime("-$i month");
+            $date = new DateTime("first day of -$i month");
             $m = (int) $date->format('m');
             $y = (int) $date->format('Y');
-            $label = $date->format('M Y');
+            $label = ($indonesian_months[$m] ?? $date->format('M')) . ' ' . $y;
             $amount = $this->get_total_platform_month($m, $y);
             $trend[] = [
                 'month' => $m,
                 'year' => $y,
                 'label' => $label,
-                'total' => $amount
+                'total' => (float) $amount
             ];
         }
         return $trend;

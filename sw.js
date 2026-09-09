@@ -1,23 +1,12 @@
 // ================================================================
-// SERVICE WORKER - Yuk Nabung PWA
+// SERVICE WORKER - Yuk Nabung PWA (v2.1.0 - Network First)
 // ================================================================
 
-const CACHE_NAME = 'yuknabung-v1.0.0';
+const CACHE_NAME = 'yuknabung-v2.1.0';
 const OFFLINE_URL = '/offline.php';
-const BASE_URL = '/';
 
-// ================================================================
-// DAFTAR FILE YANG DI-CACHE
-// ================================================================
-const urlsToCache = [
-    BASE_URL,
-    BASE_URL + 'index.php',
-    BASE_URL + 'assets/css/custom.css',
-    BASE_URL + 'assets/css/user-mode.css',
-    BASE_URL + 'assets/js/dashboard.js',
-    BASE_URL + 'assets/js/transactions.js',
-    BASE_URL + 'manifest.json',
-    BASE_URL + 'offline.php',
+// DAFTAR ASSET EKSTERNAL / STATIC YANG DI-PRECACHE
+const urlsToPrecache = [
     'https://code.jquery.com/jquery-3.6.0.min.js',
     'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css',
@@ -30,123 +19,131 @@ const urlsToCache = [
 // INSTALL SERVICE WORKER
 // ================================================================
 self.addEventListener('install', function(event) {
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(function(cache) {
-                console.log('📦 Cache opened');
-                return cache.addAll(urlsToCache);
+                return cache.addAll(urlsToPrecache);
             })
-            .then(function() {
-                console.log('✅ Service Worker installed');
-                return self.skipWaiting();
-            })
-            .catch(function(error) {
-                console.error('❌ Cache failed:', error);
+            .catch(function(err) {
+                console.warn('Precache warning:', err);
             })
     );
 });
 
 // ================================================================
-// ACTIVATE SERVICE WORKER
+// ACTIVATE SERVICE WORKER - PURGE OLD CACHES IMMEDIATELY
 // ================================================================
 self.addEventListener('activate', function(event) {
-    const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
         caches.keys().then(function(cacheNames) {
             return Promise.all(
                 cacheNames.map(function(cacheName) {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        console.log('🗑️ Deleting old cache:', cacheName);
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('🗑️ Deleting obsolete cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
         }).then(function() {
-            console.log('✅ Service Worker activated');
             return self.clients.claim();
         })
     );
 });
 
 // ================================================================
-// FETCH - INTERCEPT REQUEST
+// LISTEN FOR SKIP WAITING & CLEAR CACHE MESSAGES
+// ================================================================
+self.addEventListener('message', function(event) {
+    if (event.data === 'skipWaiting') {
+        self.skipWaiting();
+    }
+    if (event.data === 'clearCache') {
+        caches.keys().then(function(keys) {
+            return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+        });
+    }
+});
+
+// ================================================================
+// FETCH - NETWORK FIRST FOR DYNAMIC PAGES & SAME-ORIGIN ASSETS
 // ================================================================
 self.addEventListener('fetch', function(event) {
-    // Skip non-GET requests
     if (event.request.method !== 'GET') {
         return;
     }
 
     const url = new URL(event.request.url);
 
-    // Skip requests to other domains (except CDN)
-    if (url.origin !== location.origin && 
-        !url.hostname.includes('cdn') && 
-        !url.hostname.includes('fonts') && 
-        !url.hostname.includes('code.jquery.com')) {
+    // 1. DYNAMIC HTML PAGES (NAVIGATION): ALWAYS NETWORK FIRST!
+    // F5 (Normal Refresh) MUST always fetch live data from server.
+    const isNavigation = event.request.mode === 'navigate' || 
+                         (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'));
+
+    if (isNavigation) {
+        event.respondWith(
+            fetch(event.request)
+                .then(function(networkResponse) {
+                    return networkResponse;
+                })
+                .catch(function() {
+                    // Fallback to offline page only when network is unavailable
+                    return caches.match(OFFLINE_URL);
+                })
+        );
         return;
     }
 
-    // Skip API requests
-    if (url.pathname.includes('/api/') || 
-        url.pathname.includes('/admin/') && url.pathname.includes('/ajax')) {
-        return fetch(event.request);
+    // 2. SAME-ORIGIN LOCAL ASSETS (CSS, JS, Images, AJAX)
+    // Always Network-First so code updates appear immediately without hard reload!
+    if (url.origin === location.origin) {
+        event.respondWith(
+            fetch(event.request)
+                .then(function(networkResponse) {
+                    if (networkResponse && networkResponse.status === 200) {
+                        const responseClone = networkResponse.clone();
+                        caches.open(CACHE_NAME).then(function(cache) {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return networkResponse;
+                })
+                .catch(function() {
+                    // Fallback to cache if network fails
+                    return caches.match(event.request);
+                })
+        );
+        return;
     }
 
+    // 3. EXTERNAL CDN LIBRARIES (CACHE FIRST FOR SPEED)
     event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
-
-                // Clone request
-                const fetchRequest = event.request.clone();
-
-                return fetch(fetchRequest)
-                    .then(function(response) {
-                        // Check if we received a valid response
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-
-                        // Clone response
-                        const responseToCache = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(function(cache) {
-                                cache.put(event.request, responseToCache);
-                            })
-                            .catch(function(err) {
-                                console.error('Cache put error:', err);
-                            });
-
-                        return response;
-                    })
-                    .catch(function() {
-                        // If offline and request is for a page, show offline page
-                        if (event.request.headers.get('accept') && 
-                            event.request.headers.get('accept').includes('text/html')) {
-                            return caches.match(OFFLINE_URL);
-                        }
+        caches.match(event.request).then(function(cachedResponse) {
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+            return fetch(event.request).then(function(networkResponse) {
+                if (networkResponse && networkResponse.status === 200) {
+                    const responseClone = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(function(cache) {
+                        cache.put(event.request, responseClone);
                     });
-            })
+                }
+                return networkResponse;
+            });
+        })
     );
 });
 
 // ================================================================
-// PUSH NOTIFICATION
+// PUSH NOTIFICATION & CLICKS
 // ================================================================
 self.addEventListener('push', function(event) {
     let data = {};
     try {
         data = event.data.json();
     } catch (e) {
-        data = {
-            title: 'Yuk Nabung',
-            body: 'Ada notifikasi baru!'
-        };
+        data = { title: 'Yuk Nabung', body: 'Ada notifikasi baru!' };
     }
 
     const options = {
@@ -154,40 +151,14 @@ self.addEventListener('push', function(event) {
         icon: '/assets/img/icon-192x192.png',
         badge: '/assets/img/icon-72x72.png',
         vibrate: [200, 100, 200],
-        data: {
-            url: data.url || '/dashboard'
-        },
-        actions: [
-            {
-                action: 'open',
-                title: 'Lihat',
-                icon: '/assets/img/icon-72x72.png'
-            },
-            {
-                action: 'close',
-                title: 'Tutup',
-                icon: '/assets/img/icon-72x72.png'
-            }
-        ]
+        data: { url: data.url || '/dashboard' }
     };
 
-    event.waitUntil(
-        self.registration.showNotification(data.title || 'Yuk Nabung', options)
-    );
+    event.waitUntil(self.registration.showNotification(data.title || 'Yuk Nabung', options));
 });
 
-// ================================================================
-// NOTIFICATION CLICK
-// ================================================================
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
-
-    if (event.action === 'close') {
-        return;
-    }
-
-    const url = event.notification.data.url || '/dashboard';
-    event.waitUntil(
-        clients.openWindow(url)
-    );
+    const targetUrl = event.notification.data.url || '/dashboard';
+    event.waitUntil(clients.openWindow(targetUrl));
 });

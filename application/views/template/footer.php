@@ -79,8 +79,10 @@
 <?php endif; ?>
 
 <?php if (isset($page_js) && !empty($page_js)): ?>
-    <?php foreach ($page_js as $js): ?>
-    <script src="<?= base_url($js) ?>"></script>
+    <?php foreach ($page_js as $js): 
+        $js_ver = file_exists(FCPATH . $js) ? filemtime(FCPATH . $js) : time();
+    ?>
+    <script src="<?= base_url($js . '?v=' . $js_ver) ?>"></script>
     <?php endforeach; ?>
 <?php endif; ?>
 
@@ -119,10 +121,10 @@ $(document).ready(function() {
 </script>
 
 <!-- Real-time Rupiah Formatting Helper -->
-<script src="<?= base_url('assets/js/format-rupiah.js') ?>"></script>
+<script src="<?= base_url('assets/js/format-rupiah.js?v=' . (file_exists(FCPATH . 'assets/js/format-rupiah.js') ? filemtime(FCPATH . 'assets/js/format-rupiah.js') : time())) ?>"></script>
 
 <!-- Dark Mode System -->
-<script src="<?= base_url('assets/js/dark-mode.js') ?>"></script>
+<script src="<?= base_url('assets/js/dark-mode.js?v=' . (file_exists(FCPATH . 'assets/js/dark-mode.js') ? filemtime(FCPATH . 'assets/js/dark-mode.js') : time())) ?>"></script>
 
 </body>
 </html>
